@@ -26,6 +26,19 @@ Try disconnecting any other micro:bits and run cluster:bit again.""")
     print("A micro:bit has been detected on port " + microbit_name + ". Let's get clustering!\n")
     return microbit_port
 
+def wait_for_confirmation(serial_connection, category):
+    while True:
+        if category == 1:
+            message = "SENDLINE"
+        elif category == 2:
+            message = "RUNNINGTASK"
+        elif category == 3:
+            message = "TASKDONE"
+        received_text = str(serial_connection.readline(), "utf-8")
+        if received_text == message + "\n":
+            break
+        time.sleep(0.5)
+
 tkinter_root = tkinter.Tk() # setup Tkinter
 tkinter_root.withdraw() # hide root window
 
@@ -43,11 +56,18 @@ A file picker will open soon...\n""")
 time.sleep(4)
 taskfile_path = filedialog.askopenfilename()
 
-serial_connection.write(b"TASKWAITING\n")
-time.sleep(5)
-received_text = str(serial_connection.readline(), "utf-8")
-print(received_text)
-lines = ""
-with open(taskfile_path, "r") as taskfile:
+print("Notifying micro:bit of task...\n")
+serial_connection.write(b"TASKWAITING\n") # notify micro:bit that we have a waiting task
+wait_for_confirmation(serial_connection, 1) # wait for micro:bit to acknowledge
+
+print("Sending task to micro:bit...\n")
+with open(taskfile_path, "r") as taskfile: # open the taskfile
     for line in taskfile:
-        
+        serial_connection.write(line.encode()) # write one line at a time to serial
+        wait_for_confirmation(serial_connection, 1) # wait for confirmation of each line being received
+
+serial_connection.write(b"ENDOFTASK\n") # notify micro:bit that we've sent the whole task
+wait_for_confirmation(serial_connection, 2) # wait for micro:bit to acknowledge
+print("Task sent. Awaiting results...")
+
+wait_for_confirmation(serial_connection, 3)
