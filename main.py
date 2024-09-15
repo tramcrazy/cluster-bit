@@ -47,4 +47,7 @@ serial_connection.write(b"TASKWAITING\n")
 time.sleep(5)
 received_text = str(serial_connection.readline(), "utf-8")
 print(received_text)
-#with open(taskfile_path, "r") as taskfile:
+lines = ""
+with open(taskfile_path, "r") as taskfile:
+    for line in taskfile:
+        
