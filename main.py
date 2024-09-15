@@ -4,8 +4,8 @@ import sys
 import tkinter
 from tkinter import filedialog
 import time
-root = tkinter.Tk()
-def autodetect_microbits():
+
+def autodetect_microbits(): # Searches for micro:bits, returns port if one is found, prints troubleshooting and exits if 0 or >1 micro:bits found
     print("Attempting autodetection of your micro:bit...")
     ports = serial.tools.list_ports.comports() # all serial ports on computer
     microbit_num = 0 # how many micro:bits are connected?
@@ -26,9 +26,14 @@ Try disconnecting any other micro:bits and run cluster:bit again.""")
     print("A micro:bit has been detected on port " + microbit_name + ". Let's get clustering!")
     return microbit_port
 
+tkinter_root = tkinter.Tk() # setup Tkinter
+tkinter_root.withdraw() # hide root window
+
 print("Welcome to cluster:bit!")
 connected_port = autodetect_microbits()
 
 print("""You must select a task file to run on the cluster, which should be in the standard format (https://tramcrazy.com/taskfiles).
 A file picker will open soon...""")
 time.sleep(4)
+taskfile_path = filedialog.askopenfilename()
+print(taskfile_path)
