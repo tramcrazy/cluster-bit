@@ -6,7 +6,7 @@ from tkinter import filedialog
 import time
 
 def autodetect_microbits(): # Searches for micro:bits, returns port if one is found, prints troubleshooting and exits if 0 or >1 micro:bits found
-    print("Attempting autodetection of your micro:bit...")
+    print("Attempting autodetection of your micro:bit...\n")
     ports = serial.tools.list_ports.comports() # all serial ports on computer
     microbit_num = 0 # how many micro:bits are connected?
     for port in ports:
@@ -23,7 +23,7 @@ Make sure it's connected with a USB data cable and run cluster:bit again.""")
 cluster:bit is designed to work with just one micro:bit over USB, and the others over radio.
 Try disconnecting any other micro:bits and run cluster:bit again.""")
         sys.exit()
-    print("A micro:bit has been detected on port " + microbit_name + ". Let's get clustering!")
+    print("A micro:bit has been detected on port " + microbit_name + ". Let's get clustering!\n")
     return microbit_port
 
 tkinter_root = tkinter.Tk() # setup Tkinter
