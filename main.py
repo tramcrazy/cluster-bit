@@ -71,3 +71,10 @@ wait_for_confirmation(serial_connection, 2) # wait for micro:bit to acknowledge
 print("Task sent. Awaiting results...")
 
 wait_for_confirmation(serial_connection, 3)
+while True:
+    received_text = str(serial_connection.readline(), "utf-8")
+    if received_text:
+        break
+    time.sleep(0.5)
+print("Results received. Printing results...\n")
+print(received_text)
