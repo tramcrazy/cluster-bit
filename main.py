@@ -31,15 +31,20 @@ tkinter_root.withdraw() # hide root window
 
 print("""Welcome to cluster:bit!
 Please ensure your USB-connected micro:bit is running the cluster:bit MicroPython software, found in ./microbit_code/microbit_main.py
-If not, exit now and install the software on your micro:bit.""")
+If not, exit now and install the software on your micro:bit.\n""")
 
-input("Press enter to confirm your micro:bit is running cluster:bit...")
+input("Press enter to confirm your micro:bit is running cluster:bit...\n")
 
 connected_port = autodetect_microbits()
 serial_connection = serial.Serial(connected_port, 115200)
 
 print("""You must select a task file to run on cluster:bit, which should be in the standard format (https://tramcrazy.com/taskfiles).
-A file picker will open soon...""")
+A file picker will open soon...\n""")
 time.sleep(4)
 taskfile_path = filedialog.askopenfilename()
 
+serial_connection.write(b"TASKWAITING\n")
+time.sleep(5)
+received_text = str(serial_connection.readline(), "utf-8")
+print(received_text)
+#with open(taskfile_path, "r") as taskfile:

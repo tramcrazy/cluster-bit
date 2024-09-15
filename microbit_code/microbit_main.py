@@ -1,5 +1,4 @@
 import microbit
-import utime
 
 def wait_for_task():
     while True:
@@ -7,8 +6,8 @@ def wait_for_task():
             received_text = str(microbit.uart.read(), "utf-8")
             if "TASKWAITING" in received_text:
                 break
-        utime.sleep(1)
 
 while True:
     wait_for_task()
+    microbit.display.scroll("send task")
     microbit.uart.write("SENDTASK\n")
