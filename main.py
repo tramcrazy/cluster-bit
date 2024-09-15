@@ -29,11 +29,17 @@ Try disconnecting any other micro:bits and run cluster:bit again.""")
 tkinter_root = tkinter.Tk() # setup Tkinter
 tkinter_root.withdraw() # hide root window
 
-print("Welcome to cluster:bit!")
-connected_port = autodetect_microbits()
+print("""Welcome to cluster:bit!
+Please ensure your USB-connected micro:bit is running the cluster:bit MicroPython software, found in ./microbit_code/microbit_main.py
+If not, exit now and install the software on your micro:bit.""")
 
-print("""You must select a task file to run on the cluster, which should be in the standard format (https://tramcrazy.com/taskfiles).
+input("Press enter to confirm your micro:bit is running cluster:bit...")
+
+connected_port = autodetect_microbits()
+serial_connection = serial.Serial(connected_port, 115200)
+
+print("""You must select a task file to run on cluster:bit, which should be in the standard format (https://tramcrazy.com/taskfiles).
 A file picker will open soon...""")
 time.sleep(4)
 taskfile_path = filedialog.askopenfilename()
-print(taskfile_path)
+
