@@ -40,6 +40,8 @@ def wait_for_confirmation(serial_connection, category):
         time.sleep(0.5)
 
 def send_code(serial_connection, category):
+    if category == 1:
+        message = "SENDLINE"
     if category == 5:
         message = "TASKWAITING"
     elif category == 6:
@@ -78,10 +80,16 @@ wait_for_confirmation(serial_connection, 2) # wait for micro:bit to acknowledge
 print("Task sent. Awaiting results...")
 
 wait_for_confirmation(serial_connection, 3)
-while True:
-    received_text = str(serial_connection.readline(), "utf-8")
-    if received_text != "":
-        break
-    time.sleep(0.5)
-print("Results received. Printing results...\n")
-print(received_text)
+print("Please choose where to save the results.\nA file picker will open soon...")
+results_filename = filedialog.asksaveasfilename()
+send_code(serial_connection, 1)
+with open(results_filename, "w") as results_file:
+    while True:
+        received_text = str(serial_connection.readline(), "utf-8")
+        if received_text != "":
+            if received_text == "ENDRESULTS\n":
+                break
+            results_file.write(received_text)
+            send_code(serial_connection, 1)
+
+print("Results received and stored in " + results_filename)
