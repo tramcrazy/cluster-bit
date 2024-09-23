@@ -16,8 +16,7 @@ def send_code(category):
         message = "TASKDONE"
     microbit.uart.write(message + "\n")            
 
-while True:
-    wait_for_task()
+def write_taskfile():
     send_code(1)
     with open("taskfile.py", "w") as taskfile:
         while True:
@@ -28,6 +27,10 @@ while True:
                     break
                 taskfile.write(received_text)
                 send_code(1)
+
+while True:
+    wait_for_task()
+    write_taskfile()
     import taskfile
     results = taskfile.task()
     send_code(3)
