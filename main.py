@@ -39,6 +39,13 @@ def wait_for_confirmation(serial_connection, category):
             break
         time.sleep(0.5)
 
+def send_code(serial_connection, category):
+    if category == 5:
+        message = "TASKWAITING"
+    elif category == 6:
+        message = "ENDOFTASK"
+    serial_connection.write(message.encode() + b"\n")
+
 tkinter_root = tkinter.Tk() # setup Tkinter
 tkinter_root.withdraw() # hide root window
 
@@ -57,7 +64,7 @@ time.sleep(4)
 taskfile_path = filedialog.askopenfilename()
 
 print("Notifying micro:bit of task...\n")
-serial_connection.write(b"TASKWAITING\n") # notify micro:bit that we have a waiting task
+send_code(serial_connection, 5) # notify micro:bit that we have a waiting task
 wait_for_confirmation(serial_connection, 1) # wait for micro:bit to acknowledge
 
 print("Sending task to micro:bit...\n")
@@ -66,7 +73,7 @@ with open(taskfile_path, "r") as taskfile: # open the taskfile
         serial_connection.write(line.encode()) # write one line at a time to serial
         wait_for_confirmation(serial_connection, 1) # wait for confirmation of each line being received
 
-serial_connection.write(b"ENDOFTASK\n") # notify micro:bit that we've sent the whole task
+send_code(serial_connection, 6) # notify micro:bit that we've sent the whole task
 wait_for_confirmation(serial_connection, 2) # wait for micro:bit to acknowledge
 print("Task sent. Awaiting results...")
 
