@@ -14,7 +14,7 @@ def send_code(category):
         message = "RUNNINGTASK"
     elif category == 3:
         message = "TASKDONE"
-    microbit.uart.write(message + "\n")
+    microbit.uart.write(message + "\n")            
 
 while True:
     wait_for_task()
@@ -31,4 +31,4 @@ while True:
     import taskfile
     results = taskfile.task()
     send_code(3)
-    microbit.uart.write(str(results))
+    microbit.uart.write(str(results) + "\n")

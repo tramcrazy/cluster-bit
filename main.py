@@ -27,13 +27,13 @@ Try disconnecting any other micro:bits and run cluster:bit again.""")
     return microbit_port
 
 def wait_for_confirmation(serial_connection, category):
+    if category == 1:
+        message = "SENDLINE"
+    elif category == 2:
+        message = "RUNNINGTASK"
+    elif category == 3:
+        message = "TASKDONE"
     while True:
-        if category == 1:
-            message = "SENDLINE"
-        elif category == 2:
-            message = "RUNNINGTASK"
-        elif category == 3:
-            message = "TASKDONE"
         received_text = str(serial_connection.readline(), "utf-8")
         if received_text == message + "\n":
             break
