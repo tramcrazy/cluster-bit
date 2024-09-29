@@ -35,12 +35,13 @@ def wait_for_confirmation(category):
                 break
 
 def send_results(results_filename):
-    with open(results_filename, "r") as results_file:
-        for line in results_file.read():
-            microbit.uart.write(bytes(line, "utf-8"))
-            microbit.display.scroll("sl")
+    with open(results_filename, "rt") as results_file:
+        while True:
+            line = results_file.readline()
+            if len(line) == 0:
+                break
+            microbit.uart.write(str(line))
             wait_for_confirmation(1)
-    microbit.display.scroll("sent lines")
     send_code(7)
 
 while True:
@@ -50,5 +51,4 @@ while True:
     results_filename = taskfile.task()
     send_code(3)
     wait_for_confirmation(1)
-    microbit.display.scroll("got conf", wait=False)
     send_results(results_filename)

@@ -62,7 +62,6 @@ serial_connection = serial.Serial(connected_port, 115200)
 
 print("""You must select a task file to run on cluster:bit, which should be in the standard format (https://tramcrazy.com/taskfiles).
 A file picker will open soon...\n""")
-time.sleep(4)
 taskfile_path = filedialog.askopenfilename()
 
 print("Notifying micro:bit of task...\n")
