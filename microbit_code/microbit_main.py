@@ -52,3 +52,4 @@ while True:
     send_code(3)
     wait_for_confirmation(1)
     send_results(results_filename)
+    microbit.reset()

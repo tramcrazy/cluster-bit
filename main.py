@@ -3,7 +3,6 @@ import serial.tools.list_ports
 import sys
 import tkinter
 from tkinter import filedialog
-import time
 
 def autodetect_microbits(): # Searches for micro:bits, returns port if one is found, prints troubleshooting and exits if 0 or >1 micro:bits found
     print("Attempting autodetection of your micro:bit...\n")
@@ -37,7 +36,6 @@ def wait_for_confirmation(serial_connection, category):
         received_text = str(serial_connection.readline(), "utf-8")
         if received_text == message + "\n":
             break
-        time.sleep(0.5)
 
 def send_code(serial_connection, category):
     if category == 1:
@@ -47,6 +45,27 @@ def send_code(serial_connection, category):
     elif category == 6:
         message = "ENDOFTASK"
     serial_connection.write(message.encode() + b"\n")
+
+def receive_results(serial_connection, results_filename):
+    send_code(serial_connection, 1)
+    with open(results_filename, "w") as results_file:
+        while True:
+            received_text = str(serial_connection.readline(), "utf-8")
+            if received_text != "":
+                if received_text == "ENDRESULTS\n":
+                    break
+                results_file.write(received_text)
+                send_code(serial_connection, 1)
+
+def send_task(serial_connection, task_filename):
+    send_code(serial_connection, 5) # notify micro:bit that we have a waiting task
+    wait_for_confirmation(serial_connection, 1) # wait for micro:bit to acknowledge
+    with open(task_filename, "r") as taskfile: # open the taskfile
+        for line in taskfile:
+            serial_connection.write(line.encode()) # write one line at a time to serial
+            wait_for_confirmation(serial_connection, 1) # wait for confirmation of each line being received
+    send_code(serial_connection, 6) # notify micro:bit that we've sent the whole task
+    wait_for_confirmation(serial_connection, 2) # wait for micro:bit to acknowledge
 
 tkinter_root = tkinter.Tk() # setup Tkinter
 tkinter_root.withdraw() # hide root window
@@ -63,32 +82,14 @@ serial_connection = serial.Serial(connected_port, 115200)
 print("""You must select a task file to run on cluster:bit, which should be in the standard format (https://tramcrazy.com/taskfiles).
 A file picker will open soon...\n""")
 taskfile_path = filedialog.askopenfilename()
-
-print("Notifying micro:bit of task...\n")
-send_code(serial_connection, 5) # notify micro:bit that we have a waiting task
-wait_for_confirmation(serial_connection, 1) # wait for micro:bit to acknowledge
+print("Please select where to store the results of the task.\n")
+results_filename = filedialog.asksaveasfilename()
 
 print("Sending task to micro:bit...\n")
-with open(taskfile_path, "r") as taskfile: # open the taskfile
-    for line in taskfile:
-        serial_connection.write(line.encode()) # write one line at a time to serial
-        wait_for_confirmation(serial_connection, 1) # wait for confirmation of each line being received
-
-send_code(serial_connection, 6) # notify micro:bit that we've sent the whole task
-wait_for_confirmation(serial_connection, 2) # wait for micro:bit to acknowledge
-print("Task sent. Awaiting results...")
+send_task(serial_connection, taskfile_path)
 
 wait_for_confirmation(serial_connection, 3)
-print("Please choose where to save the results.\nA file picker will open soon...")
-results_filename = filedialog.asksaveasfilename()
-send_code(serial_connection, 1)
-with open(results_filename, "w") as results_file:
-    while True:
-        received_text = str(serial_connection.readline(), "utf-8")
-        if received_text != "":
-            if received_text == "ENDRESULTS\n":
-                break
-            results_file.write(received_text)
-            send_code(serial_connection, 1)
+print("Task complete! Saving results...\n")
+receive_results(serial_connection, results_filename)
 
 print("Results received and stored in " + results_filename)
